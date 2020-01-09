@@ -1,50 +1,44 @@
 import {
-  BaseEntity,
   Column,
   Entity,
   Index,
   JoinColumn,
   ManyToOne,
-  JoinTable
+  OneToMany,
+  BaseEntity
 } from "typeorm";
+import { Project } from "./project";
 import { Address } from "./address";
 
+@Index("addressId", ["addressId"], {})
 @Entity("User", { schema: "boilerplate" })
-@Index("addressId", ["address"])
-export class User extends BaseEntity {
-  @Column("char", {
-    nullable: false,
-    primary: true,
-    length: 11,
-    name: "cpf"
-  })
+export class User extends BaseEntity{
+  @Column("char", { primary: true, name: "cpf", length: 11 })
   cpf: string;
 
-  @Column("varchar", {
-    nullable: false,
-    length: 200,
-    name: "name"
-  })
+  @Column("varchar", { name: "name", length: 200 })
   name: string;
 
-  @Column("enum", {
-    nullable: false,
-    enum: ["M", "F"],
-    name: "sex"
-  })
-  sex: ["M", "F"];
+  @Column("enum", { name: "sex", enum: ["M", "F"] })
+  sex: "M" | "F";
 
-  @Column("date", {
-    nullable: false,
-    name: "birth"
-  })
+  @Column("date", { name: "birth" })
   birth: string;
 
-  @ManyToOne(
-    type => Address,
-    address => address.users,
-    { nullable: false, onDelete: "RESTRICT", onUpdate: "RESTRICT" }
+  @Column("bigint", { name: "addressId" })
+  addressId: string;
+
+  @OneToMany(
+    () => Project,
+    project => project.user
   )
-  @JoinColumn({ name: "addressId", referencedColumnName: "id" })
+  projects: Project[];
+
+  @ManyToOne(
+    () => Address,
+    address => address.users,
+    { onDelete: "RESTRICT", onUpdate: "RESTRICT" }
+  )
+  @JoinColumn([{ name: "addressId", referencedColumnName: "id" }])
   address: Address;
 }
